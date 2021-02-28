@@ -1,12 +1,12 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
-#include<fcntl.h> 
+#include<fcntl.h>  // for open close of file
 #include<errno.h> 
-#include<sys/types.h>
+#include<sys/types.h> // for system calls
 #include"buffer.h"
 #include"gui.h"
-#include <sys/stat.h>
+#include <sys/stat.h>   
 #include<unistd.h>
 #include<ncurses.h>
 
@@ -82,18 +82,31 @@ int main(int argc, char *argv[]) {
 
         switch(ch) {
             
-			case KEY_LEFT: /*left arrow*/
+			case KEY_LEFT:  // left arrow
 				if(x > 0){
 					move(y, --x);
 				}
 				break;
 
-            case KEY_RIGHT:
+            case KEY_RIGHT: // right arrow
                 if(x < LINEMAX) {
                     move(y, ++x);
                 }
                 break;
 
+            case KEY_UP:
+                if(y != 0) {
+                    y--;
+                    bf = bf->prev;
+                    if(x >= bf->num_chars) {
+                        x = bf->num_chars - 1;
+                    }
+                    move(y, x);
+                }
+                else {
+                    move(y, x);
+                }
+                break;
 
             case KEY_DOWN:
                 // if(bf->next != NULL) {

@@ -41,13 +41,13 @@ int main(int argc, char *argv[]) {
 
     getmaxyx(stdscr, ht, wd); // ht = heigth , wd = width
     keypad(stdscr, TRUE);
-    attron(COLOR_PAIR(1));
     mvprintw(ht/2 - 12, wd/2 - 19, "-------------------------------------");
     mvprintw(ht/2 - 11, wd/2 - 20, "|                                     |");
+    attron(COLOR_PAIR(1));
 	mvprintw(ht/2 - 10, wd/2 - 20, "|   WELCOME TO NIKITA's TEXT EDITOR   |");
+	attroff(COLOR_PAIR(1));
     mvprintw(ht/2 - 9, wd/2 - 20,  "|                                     |");
     mvprintw(ht/2 - 8, wd/2 - 19,  "-------------------------------------");
-	attroff(COLOR_PAIR(1));
 	attron(COLOR_PAIR(2));
 	mvprintw(ht/2 - 5, wd/2 - 17, "CTRL+S OR F2 :  SAVE");
 	mvprintw(ht/2 - 4, wd/2 - 17, "CTRL+A OR F3 :  SAVE AND QUIT");
@@ -72,16 +72,16 @@ int main(int argc, char *argv[]) {
 
     loadwin(bf, 0);
     attron(COLOR_PAIR(1));
-	mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d | copy: \"%s\" |", filename, y, x, copybuf );
+	mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d |", filename, y, x );
 	move(y, x);
 	attroff(COLOR_PAIR(1));
 	refresh();
 	move(0, 0);
     getch();
     clear();
-    endwin();
   	distroy_buffer(bf);
     refresh();
+    endwin();
     
     return 0;
 }

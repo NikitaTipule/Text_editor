@@ -6,17 +6,18 @@
 #include<sys/types.h>
 #include"buffer.h"
 #include"gui.h"
+#include <sys/stat.h>
 #include<unistd.h>
 #include<ncurses.h>
 
 
 int main(int argc, char *argv[]) {
 
-    int fd, newfile = 0, ht, wd, x , y;
-    char filename[255], copybuf[LINEMAX]; // max size of character is 255 characters
-    buffer *bf;
+    int fd, newfile = 0, ht, wd, x , y, i = 0, ch;
+    char filename[255]; // max size of character is 255 characters
+    buffer *bf, *head, *st;
     init_buffer(&bf);
-    if(argc == 2) {
+    if(argc == 2) {  // when filename is provided 
         strcpy(filename, argv[1]);
         if(fileexist(filename)) {
             fd = open(filename, O_RDWR);
@@ -26,10 +27,8 @@ int main(int argc, char *argv[]) {
             // distroy_buffer(bf);
         }
     }
-    else if(argc == 1) {
+    else if(argc == 1) { // when filename is not provided then start an empty buffer and then insert character into that buffer
         newfile = 1;
-        // bf->line[0] = '\n';
-        // bf->num_chars = 1;
     }
     else {
         printf("USAGE : ./project <filename> or ./project");
@@ -69,7 +68,6 @@ int main(int argc, char *argv[]) {
     y = 0, x = 0;
 	move(y, x);
 	refresh();
-
     loadwin(bf, 0);
     attron(COLOR_PAIR(1));
 	mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d |", filename, y, x );
@@ -77,7 +75,107 @@ int main(int argc, char *argv[]) {
 	attroff(COLOR_PAIR(1));
 	refresh();
 	move(0, 0);
-    getch();
+
+    head = bf, st = bf;
+    while(ch = getch()) {
+
+
+        switch(ch) {
+            
+			case KEY_LEFT: /*left arrow*/
+				if(x > 0){
+					move(y, --x);
+				}
+				break;
+
+            case KEY_RIGHT:
+                if(x < LINEMAX) {
+                    move(y, ++x);
+                }
+                break;
+
+
+            case KEY_DOWN:
+                // if(bf->next != NULL) {
+                //     bf = bf->next;
+                //     move(bf->cur_line, bf->cur_X);
+                //     loadwin(head, 0);
+                // } 
+                if(y < ht - 2 && bf != NULL){
+					if(bf->next != NULL){
+						bf = bf->next;
+						if(x >= bf->num_chars){
+							if(bf->num_chars  > 0){
+								x = bf->num_chars - 1;								
+							}
+							else{
+								x = 0;
+							}
+							move(++y, x);
+						}
+						else{
+							move(++y, x);
+						}
+					}
+				}
+				// else if( y == ht - 2 && bf->next != NULL && st->next != NULL){
+				// 	st = st->next;
+				// 	bf = bf->next;
+				// 	loadwin(st, 0);
+				// 	move(y, x);
+				// }
+				break;
+
+
+            case '3':
+                clear();
+                distroy_buffer(bf);
+                refresh();
+                endwin();
+                exit(0);
+                
+
+            case '\n' :
+                buf_create_next(bf); // created next buffer
+                charInsert(bf, ch, x);
+                i = 0;
+                bf = bf->next;
+                charInsert(bf, ch, 0);
+                x = 0;
+                move(++y, x);
+                loadwin(head, 0);
+                break;
+            
+            default :
+                if(i < LINEMAX) {
+                    charInsert(bf, ch, x++);
+                    move(bf->cur_line, x);
+                    loadwin(head, 0);
+                }
+                else {
+                    
+                    buf_create_next(bf); // created next buffer
+                    i = 0;
+                    bf->next->prev = bf;
+                    bf = bf->next;
+                    bf->cur_line = bf->prev->cur_line + 1;
+                    bf->line[i] = ch;
+                    bf->num_chars = i;
+                    bf->cur_X = ++i;
+                    move(bf->cur_line, x);
+                    loadwin(head, 0);
+                }
+                break;
+
+
+        }
+        attron(COLOR_PAIR(1));
+        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d |", filename, y, x );
+        move(y, x);
+        attroff(COLOR_PAIR(1));
+        refresh();
+    }
+
     clear();
   	distroy_buffer(bf);
     refresh();

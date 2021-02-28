@@ -18,4 +18,4 @@ void buf_create_next(buffer *bf);
 void buffer_load(int fd, buffer *bf);
 void buf_print_stdout(buffer *bf);
 void distroy_buffer(buffer *bf);
-
+void charInsert(buffer *bf, char ch, int loc);

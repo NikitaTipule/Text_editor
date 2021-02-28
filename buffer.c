@@ -5,6 +5,7 @@
 #include<sys/types.h>
 #include<errno.h> 
 #include"buffer.h"
+#include<sys/stat.h>
 #include<ncurses.h>
 #include<unistd.h>
 #include"gui.h"
@@ -90,6 +91,8 @@ void buffer_load(int fd, buffer *bf) {
     }
 }
 
+// implimented to check that is the buffer loads all the characters into it from an existing file .
+// this function prints the buffer content to the stdout
 void buf_print_stdout(buffer *bf) {
     while(1) {
         if(bf == NULL) 
@@ -101,16 +104,6 @@ void buf_print_stdout(buffer *bf) {
     }
 }
 
-// void distroy_buffer(buffer *bf) {
-//     while(bf != NULL) {
-//         buffer *b = bf;
-//         bf = bf->next;
-//         bf->prev = NULL;
-//         b->next = NULL;
-//         free(b->line);
-//         free(b);
-//     }
-// }
 
 /*destroys (clears all data in them) all the buffers after and including current buffer. */
 void distroy_buffer(buffer *bf){
@@ -123,4 +116,26 @@ void distroy_buffer(buffer *bf){
 		free(temp);
 	}
 
+}
+
+void charInsert(buffer *bf, char ch, int loc) {
+    if(loc == LINEMAX) {
+        return;
+    }
+    else if(loc == bf->num_chars) {
+        bf->line[loc] = ch;
+        bf->num_chars++;
+        bf->cur_X = loc+1;
+    }
+    else if(bf->num_chars == 0) {
+        bf->line[0] = ch;
+        bf->num_chars++;
+        bf->cur_X++;
+    }
+    else {
+        memmove(bf->line + loc + 1, bf->line + loc, bf->num_chars - loc);
+        bf->line[loc] = ch;
+        bf->num_chars++;
+        bf->cur_X++;
+    }
 }

@@ -4,7 +4,6 @@
 
 void init_window() {
     initscr();
-    // noecho();
     raw();
     curs_set(2);
     start_color();

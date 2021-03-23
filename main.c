@@ -90,10 +90,29 @@ int main(int argc, char *argv[]) {
 				if(x > 0){
 					move(y, --x);
 				}
+                else if(x == 0 && y > 0) {
+                    bf = bf->prev;
+                    x = bf->num_chars;
+                    move(--y, x);
+                }
+                else if(x == 0 && y == 0) {
+                    move(y, x);
+                }
 				break;
 
             case KEY_RIGHT: // right arrow
-                if(x < LINEMAX) {
+                // if(x < LINEMAX) {
+                //     move(y, ++x);
+                // }
+                if(bf->next == NULL && x == bf->num_chars) {
+                    move(y, x);
+                }
+                else if(bf->next != NULL && x == bf->num_chars) {
+                    bf = bf->next;
+                    x = 0;
+                    move(++y, x);
+                } 
+                else {
                     move(y, ++x);
                 }
                 break;

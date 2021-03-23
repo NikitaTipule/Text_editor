@@ -100,10 +100,8 @@ int main(int argc, char *argv[]) {
                 }
 				break;
 
+
             case KEY_RIGHT: // right arrow
-                // if(x < LINEMAX) {
-                //     move(y, ++x);
-                // }
                 if(bf->next == NULL && x == bf->num_chars) {
                     move(y, x);
                 }
@@ -116,6 +114,7 @@ int main(int argc, char *argv[]) {
                     move(y, ++x);
                 }
                 break;
+
 
             case KEY_UP:  // up arrow
                 if(y != 0) {
@@ -130,6 +129,7 @@ int main(int argc, char *argv[]) {
                     move(y, x);
                 }
                 break;
+
 
             case KEY_DOWN:  // down arrow
                 // if(bf->next != NULL) {
@@ -276,10 +276,10 @@ int main(int argc, char *argv[]) {
                 loadwin(head, 0);
                 break;
 
-
-            case '3':
+            case 17:
+            case KEY_F(4):
                 clear();
-                distroy_buffer(bf);
+                distroy_buffer(head);
                 refresh();
                 endwin();
                 exit(0);

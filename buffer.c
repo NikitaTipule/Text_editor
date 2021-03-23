@@ -140,11 +140,7 @@ void charInsert(buffer *bf, char ch, int loc) {
 }
 
 
-void bufSave(int fd, buffer *bf) {
-    if(lseek(fd, 0, SEEK_SET) == -1){
-		
-		perror("lseek error: ");
-	}
+void bufSave(int fd, buffer *bf) {    
     while(bf != NULL) {
         if(write(fd, bf->line, bf->num_chars) == -1) {
             printf("Error while writing :(");

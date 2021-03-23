@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
             fd = open(filename, O_RDWR);
             buffer_load(fd, bf);
             close(fd);
-            buf_print_stdout(bf);
+            //buf_print_stdout(bf);  // to test only that buffer is loaded or not
             // distroy_buffer(bf);
         }
         else {
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
         }
     }
     else if(argc == 1) { // when filename is not provided then start an empty buffer and then insert character into that buffer
-        newfile = 1;
+        newfile = 1;  // used as a flag to create a new file
     }
     else {
         printf("USAGE : ./editor <filename> or ./editor");
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 	mvprintw(ht/2 + 3, wd/2 - 17, "CTRL+H OR F10 : SHOW HELP WINDOW");
 	attroff(COLOR_PAIR(2));
 	attron(COLOR_PAIR(1));
-	mvprintw(ht/2 + 6, wd/2 - 17, "WINDOW SIZE: %3d X %3d", wd, ht); 
+	mvprintw(ht/2 + 6, wd/2 - 17, "WINDOW SIZE: %d X %d", wd, ht); 
 	mvprintw(ht/2 + 8, wd/2 - 17, "PRESS ANY KEY TO CONTINUE");
 	attroff(COLOR_PAIR(1));
 	getch();
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 	refresh();
     loadwin(bf, 0);
     attron(COLOR_PAIR(1));
-	mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d |", filename, y+1, x+1 );
+	mvprintw(ht - 1, 0, "| filename: %s | row : %d | col: %d |", filename, y+1, x+1 );
 	move(y, x);
 	attroff(COLOR_PAIR(1));
 	refresh();
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
 
-            case KEY_UP:
+            case KEY_UP:  // up arrow
                 if(y != 0) {
                     y--;
                     bf = bf->prev;
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
 
-            case KEY_DOWN:
+            case KEY_DOWN:  // down arrow
                 // if(bf->next != NULL) {
                 //     bf = bf->next;
                 //     move(bf->cur_line, bf->cur_X);
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
 				
 				break;
 
-            case KEY_BACKSPACE:
+            case KEY_BACKSPACE:  // backspace
                 // if(bf != NULL) {
                 //     if(x != 0) {
                 //         memmove(bf->line + x-1, bf->line + x, bf->num_chars - x);

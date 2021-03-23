@@ -138,37 +138,6 @@ int main(int argc, char *argv[]) {
 				break;
 
             case KEY_BACKSPACE:  // backspace
-                // if(bf != NULL) {
-                //     if(x != 0) {
-                //         memmove(bf->line + x-1, bf->line + x, bf->num_chars - x);
-                //         move(y, --x);
-                //         loadwin(head, 0);
-                //     }
-                //     else if(x == 0 && y != 0){
-                //         memmove(bf->line + x-1, bf->line + x, bf->num_chars - x);
-                //         bf->num_chars--;
-                //         // if(bf->num_chars == 0) {
-                //         //     buffer *temp = bf;
-                //         //     bf->prev->next = bf->next;
-                //         //     bf->next->prev = bf->prev;
-                //         //     bf = bf->next;
-                //         //     free(temp->line);
-                //         //     free(temp);
-                //         //     buffer *temp2 = bf;
-                //         //     y = bf->cur_line;
-                //         //     while(temp2) {
-                //         //         temp->cur_line = y--;
-                //         //         temp2 = temp2->next;
-                //         //     }
-                //         //     y = bf->cur_line;
-                //         // }
-                //         bf = bf->prev;
-                //         x = bf->num_chars - 1;
-                //         move(--y, x);
-                //         loadwin(head, 0);
-                //     }
-                    
-                // }
 
                 if(bf != NULL) {
                     if(x != 0) {
@@ -178,6 +147,7 @@ int main(int argc, char *argv[]) {
                         loadwin(head, 0);
                     }
                     else if(y != 0 && x == 0) {
+
                         if(bf->num_chars == 1) {
                             buffer *temp2;
                             temp2 = bf;
@@ -246,6 +216,46 @@ int main(int argc, char *argv[]) {
                 }
                 bufSave(fd, head);
                 break;
+            
+            // case KEY_DC :   // delete a character
+            //     if(bf->next == NULL && y == bf->cur_line && x == bf->num_chars - 1) {
+            //         move(x, y);
+            //         loadwin(head, 0);
+            //         break;
+            //     }
+            //     break;
+
+
+            case 8: // ascii of ctrl + h
+            case KEY_F(10):
+                clear();
+                mvprintw(ht/2 - 12, wd/2 - 19, "-------------------------------------");
+                mvprintw(ht/2 - 11, wd/2 - 20, "|                                     |");
+                attron(COLOR_PAIR(1));
+                mvprintw(ht/2 - 10, wd/2 - 20, "|   WELCOME TO NIKITA's TEXT EDITOR   |");
+                attroff(COLOR_PAIR(1));
+                mvprintw(ht/2 - 9, wd/2 - 20,  "|                                     |");
+                mvprintw(ht/2 - 8, wd/2 - 19,  "-------------------------------------");
+                attron(COLOR_PAIR(2));
+                mvprintw(ht/2 - 5, wd/2 - 17, "CTRL+S OR F2 :  SAVE");
+                mvprintw(ht/2 - 4, wd/2 - 17, "CTRL+A OR F3 :  SAVE AND QUIT");
+                mvprintw(ht/2 - 3, wd/2 - 17, "CTRL+Q OR F4 :  QUIT WITHOUT SAVE");
+                mvprintw(ht/2 - 2, wd/2 - 17, "CTRL+F OR F5 :  SEARCH");
+                mvprintw(ht/2 - 1, wd/2 - 17, "CTRL+R OR F6 :  SEARCH AND REPLACE");
+                mvprintw(ht/2 - 0, wd/2 - 17, "CTRL+X OR F7 :  CUT");
+                mvprintw(ht/2 + 1, wd/2 - 17, "CTRL+C OR F8 :  COPY");
+                mvprintw(ht/2 + 2, wd/2 - 17, "CTRL+V OR F9 :  PASTE");
+                mvprintw(ht/2 + 3, wd/2 - 17, "CTRL+H OR F10 : SHOW HELP WINDOW");
+                attroff(COLOR_PAIR(2));
+                attron(COLOR_PAIR(1));
+                mvprintw(ht/2 + 6, wd/2 - 17, "WINDOW SIZE: %d X %d", wd, ht); 
+                mvprintw(ht/2 + 8, wd/2 - 17, "PRESS ANY KEY TO CONTINUE");
+                attroff(COLOR_PAIR(1));
+                getch();
+                clear();
+                loadwin(head, 0);
+                break;
+
 
             case '3':
                 clear();

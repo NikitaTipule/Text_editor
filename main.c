@@ -74,6 +74,7 @@ int main(int argc, char *argv[]) {
     loadwin(bf, 0);
     attron(COLOR_PAIR(1));
 	mvprintw(ht - 1, 0, "| filename: %s | row : %d | col: %d |", filename, y+1, x+1 );
+    mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
 	move(y, x);
 	attroff(COLOR_PAIR(1));
 	refresh();
@@ -301,6 +302,7 @@ int main(int argc, char *argv[]) {
         }
         attron(COLOR_PAIR(1));
         mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d |", filename, y+1, x+1 );
+        mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
         move(y, x);
         attroff(COLOR_PAIR(1));
         refresh();

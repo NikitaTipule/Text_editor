@@ -276,7 +276,32 @@ int main(int argc, char *argv[]) {
                 loadwin(head, 0);
                 break;
 
-            case 17:
+
+            case 1: // ascii of ctrl + A (save and quit)
+            case KEY_F(3):
+                move(ht-1, 0);
+                clrtoeol();
+                if(newfile == 1) {
+                    attron(COLOR_PAIR(1));
+                    mvprintw(ht-1, 0, "Enter file name : ");
+                    mvscanw(ht-1, strlen("Enter file name : "), "%s", filename);
+                    attroff(COLOR_PAIR(1));
+                    refresh();
+                    if((fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU)) == -1) {
+                        printf("Error :(");
+                        return 0;
+                    }
+                    newfile = 0;
+                    loadwin(head, 0);
+                    move(y, x);
+                }
+                else {
+                    fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU);
+                }
+                bufSave(fd, head);
+                
+
+            case 17:   // ascii of ctrl + Q (quit)
             case KEY_F(4):
                 clear();
                 distroy_buffer(head);

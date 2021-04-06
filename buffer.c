@@ -148,3 +148,40 @@ void bufSave(int fd, buffer *bf) {
         bf = bf->next;
     }
 }
+
+//funtion to increase the line number by given number of all the buffers starting from the given buffer
+void buf_Incr_lineno(buffer *bf, int no) {
+    buffer *temp = bf;
+    while(temp->next != NULL) {
+        temp->cur_line = temp->cur_line + no;
+        temp = temp->next;
+    }
+    (temp->cur_line)++;
+}
+
+// Function to decrement the line number by given number of all buffers stating form the given buffer
+void buf_Decr_lineno(buffer *bf, int no) {
+    buffer *temp = bf;
+    while(temp->next != NULL) {
+        temp->cur_line = temp->cur_line - no;
+        temp = temp->next;
+    }
+    (temp->cur_line)--;
+}
+
+void bufInsert_betw(buffer *bf) {
+    if(bf->next == NULL) {
+        buf_create_next(bf);
+        return;
+    }
+    buf_Incr_lineno(bf->next, 1);
+    buffer *temp;
+    temp = (buffer *)malloc(sizeof(buffer));
+    temp->next = bf->next;
+    temp->prev = bf;
+    bf->next->prev = temp;
+    bf->next = temp;
+    bf->next->cur_line = bf->cur_line + 1;
+    bf->next->num_chars = 0;
+    Lineinit(bf->next);
+}

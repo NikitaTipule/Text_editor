@@ -1,0 +1,74 @@
+#include<iostream>
+#include <cmath>
+using namespace std;
+
+
+class Polygon {
+    protected :
+        float width;
+        float height;
+    public:
+        void setParameters(float w, float h) {
+            width = w;
+            height = h;
+        }
+};
+
+// Rectangle class derived from polygon class
+class Rectangle : public Polygon {
+
+    public:
+        //return the area of rectangle
+        float area() {
+            return width*height;
+        }
+
+        //return the perimeter of rectangle
+        float perimeter() {
+            return 2*(width+height);
+        }
+
+        //set width
+        void setwidth(float w) {
+            if(width<= 0) {
+                cout<<"width can't be negative or zero\n";
+                return;
+            }
+            width = w;
+        }
+
+        //set height
+        void setheight(float h) {
+            if(height<=0) {
+                cout<<"\nheight can't be negaive or zero\n";
+                return;
+            }
+            height = h;
+        }
+
+        //get width from user
+        float getwidth() {
+            return width;
+        }
+
+        //get height from user
+        float getheight() {
+            return height;
+        }
+};
+
+// Square class derived from polygon class
+class Square : public Polygon {
+
+    public:
+        //return the area of Square
+        float area() {
+            return width*width;
+        }
+
+        //return the perimeter of Square
+        float perimeter() {
+            return 4*width;
+        }
+
+   

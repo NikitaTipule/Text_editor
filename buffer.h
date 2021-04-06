@@ -20,3 +20,6 @@ void buf_print_stdout(buffer *bf);
 void distroy_buffer(buffer *bf);
 void charInsert(buffer *bf, char ch, int loc);
 void bufSave(int fd, buffer *bf);
+void bufInsert_betw(buffer *bf);
+void buf_Decr_lineno(buffer *bf, int no);
+void buf_Incr_lineno(buffer *bf, int no);

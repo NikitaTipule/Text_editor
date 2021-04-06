@@ -11,9 +11,9 @@
 
 int main(int argc, char *argv[]) {
 
-    int fd, newfile = 0, ht, wd, x , y, i = 0, ch;
+    int fd, newfile = 0, ht, wd, x , y, i = 0, ch, offY = 0, total_lines;
     char filename[255]; // max size of character is 255 in linux
-    buffer *bf, *head, *st;
+    buffer *bf, *head, *st, *winStart;
     init_buffer(&bf);
     if(argc == 2) {  // when filename is provided 
         strcpy(filename, argv[1]);
@@ -60,6 +60,7 @@ int main(int argc, char *argv[]) {
 	mvprintw(ht/2 + 1, wd/2 - 17, "CTRL+C OR F8 :  COPY");
 	mvprintw(ht/2 + 2, wd/2 - 17, "CTRL+V OR F9 :  PASTE");
 	mvprintw(ht/2 + 3, wd/2 - 17, "CTRL+H OR F10 : SHOW HELP WINDOW");
+    mvprintw(ht/2 + 4, wd/2 - 17, "CTRL+G OR F11 : GO TO LINE NUMBER");
 	attroff(COLOR_PAIR(2));
 	attron(COLOR_PAIR(1));
 	mvprintw(ht/2 + 6, wd/2 - 17, "WINDOW SIZE: %d X %d", wd, ht); 
@@ -73,14 +74,14 @@ int main(int argc, char *argv[]) {
 	refresh();
     loadwin(bf, 0);
     attron(COLOR_PAIR(1));
-	mvprintw(ht - 1, 0, "| filename: %s | row : %d | col: %d |", filename, y+1, x+1 );
+	mvprintw(ht - 1, 0, "| filename: %s | row : %d | col: %d |", filename, bf->cur_line, x+1 );
     mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
 	move(y, x);
 	attroff(COLOR_PAIR(1));
 	refresh();
 	move(0, 0);
 
-    head = bf, st = bf;
+    head = bf, st = bf, winStart = bf;
     while(ch = getch()) {
 
 
@@ -117,7 +118,17 @@ int main(int argc, char *argv[]) {
 
 
             case KEY_UP:  // up arrow
-                if(y != 0) {
+                if(winStart->prev != NULL && y == 0 && bf->prev != NULL) {
+                    
+                    bf = bf->prev;
+                    winStart = winStart->prev;
+                    if(x >= bf->num_chars) {
+                        x = bf->num_chars - 1;
+                    }
+                    move(y, x);
+                    loadwin(winStart, 0);
+                }
+                else if(y > 0) {
                     y--;
                     bf = bf->prev;
                     if(x >= bf->num_chars) {
@@ -154,6 +165,13 @@ int main(int argc, char *argv[]) {
 						}
 					}
 				}
+                else if( y == ht -2 && bf->next != NULL && winStart->next != NULL) {
+                    
+                    winStart = winStart->next;
+                    bf = bf->next;
+                    loadwin(winStart, 0);
+                    move(y, x);
+                }
 				
 				break;
 
@@ -266,6 +284,7 @@ int main(int argc, char *argv[]) {
                 mvprintw(ht/2 + 1, wd/2 - 17, "CTRL+C OR F8 :  COPY");
                 mvprintw(ht/2 + 2, wd/2 - 17, "CTRL+V OR F9 :  PASTE");
                 mvprintw(ht/2 + 3, wd/2 - 17, "CTRL+H OR F10 : SHOW HELP WINDOW");
+                mvprintw(ht/2 + 4, wd/2 - 17, "CTRL+G OR F11 : GO TO LINE NUMBER");
                 attroff(COLOR_PAIR(2));
                 attron(COLOR_PAIR(1));
                 mvprintw(ht/2 + 6, wd/2 - 17, "WINDOW SIZE: %d X %d", wd, ht); 
@@ -308,18 +327,109 @@ int main(int argc, char *argv[]) {
                 refresh();
                 endwin();
                 exit(0);
+
+            // case  : //ctrl + G
+            //     move(ht-1, 0);
+            //     clrtoeol();
+            //     attron(COLOR_PAIR(1));
+            //     mvprintw(ht-1, 0, "Enter Line number : ");
+            //     mvscanw(ht-1, strlen("Enter file name : "), "%d", filename);
+            //     attroff(COLOR_PAIR(1));
+            //     refresh();
+            //         if((fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU)) == -1) {
+            //             printf("Error :(");
+            //             return 0;
+            //         }
+            //         newfile = 0;
+            //         loadwin(head, 0);
+            //         move(y, x);
+                
+               
                 
 
             case '\n' :
-                buf_create_next(bf); // created next buffer
-                charInsert(bf, ch, x);
-                i = 0;
-                bf = bf->next;
-                // charInsert(bf, ch, 0);
-                x = 0;
-                move(++y, x);
-                loadwin(head, 0);
-                break;
+                // if(x == bf->num_chars && bf->next == NULL) {
+                    // buf_create_next(bf); // created next buffer
+                    // charInsert(bf, ch, x);
+                    // i = 0;
+                    // bf = bf->next;
+                    // // charInsert(bf, ch, 0);
+                    // x = 0;
+                    // move(++y, x);
+                    // loadwin(head, 0);
+                // }
+                // else if(bf -> next == NULL) {
+                //     buf_create_next(bf);
+                //     charInsert(bf, ch, x);
+                //     i = 0;
+                //     memmove(bf->next->line + x, bf->line + x, bf->num_chars - x);
+                //     memset(bf->line + x, '\0', bf->num_chars - x);
+                //     bf->num_chars = bf->num_chars - x;
+                //     bf = bf -> next;
+                //     x = 0;
+                //     y++;
+                //     move(y, x);
+                //     loadwin(head, 0);
+                // }
+                // else {
+                //     buffer *temp;
+                //     temp = bf->next;
+                //     buf_create_next(bf);
+                //     temp->prev = bf->next;
+                //     memmove(bf->next->line + x, bf->line + x, bf->num_chars - x);
+                //     memset(bf->line, '\0', bf->num_chars - x);
+                //     bf = bf->next;
+                //     while(temp) {
+                //         temp->cur_line + 1;
+                //         temp = temp->next;
+                //     }
+                //     x = 0;
+                //     y++;
+                //     move(y, x);
+                //     loadwin(head, 0);
+                // }
+                // break;
+                bf->cur_X = x;
+				charInsert(bf, bf->cur_X, ch);
+				if(x < bf->num_chars -1){
+					bufInsert_betw(bf);
+					memmove(bf->next->line, (bf->line + x + 1), bf->num_chars - x + 1);
+					memset((bf->line + x + 1), '\0', bf->num_chars - x);
+					bf->next->num_chars = bf->num_chars - x - 1;
+					bf->num_chars = x + 1;
+					bf = bf->next;
+					if(y < ht - 2)
+						move(++y, x = 0);
+					else{
+						if(winStart->next != NULL){
+							winStart = winStart->next;
+							offY++;
+						}
+
+						move(y = ht - 2, x = 0);
+					}
+					loadwin(winStart, 0);
+
+
+				}
+				else if(x == bf->num_chars || x == bf->num_chars - 1){
+					bufInsert_betw(bf);
+					clear();
+					loadwin(winStart, 0);					
+					bf = bf->next;
+					if(y < ht - 2)
+						move(++y, x = 0);
+					else{
+						if(winStart->next != NULL){
+							winStart = winStart->next;
+							offY++;
+						}
+
+						move(y = ht - 2, x = 0);
+					}
+					loadwin(winStart, 0);
+				}
+				break;
             
             default :
                 if(i < LINEMAX) {
@@ -340,12 +450,13 @@ int main(int argc, char *argv[]) {
                     move(bf->cur_line, x);
                     loadwin(head, 0);
                 }
+                total_lines++;
                 break;
 
 
         }
         attron(COLOR_PAIR(1));
-        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d |", filename, y+1, x+1 );
+        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d |", filename, bf->cur_line, x+1 );
         mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
         move(y, x);
         attroff(COLOR_PAIR(1));

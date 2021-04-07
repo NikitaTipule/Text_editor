@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 	refresh();
     loadwin(bf, 0);
     attron(COLOR_PAIR(1));
-	mvprintw(ht - 1, 0, "| filename: %s | row : %d | col: %d |", filename, bf->cur_line, x+1 );
+	mvprintw(ht - 1, 0, "| filename: %s | row : %d | col: %d |", filename, bf->cur_line + 1, x+1 );
     mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
 	move(y, x);
 	attroff(COLOR_PAIR(1));
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 				}
                 else if(x == 0 && y > 0) {
                     bf = bf->prev;
-                    x = bf->num_chars;
+                    x = bf->num_chars-1;
                     move(--y, x);
                 }
                 else if(x == 0 && y == 0) {
@@ -103,10 +103,10 @@ int main(int argc, char *argv[]) {
 
 
             case KEY_RIGHT: // right arrow
-                if(bf->next == NULL && x == bf->num_chars) {
+                if(bf->next == NULL && x == bf->num_chars-1) {
                     move(y, x);
                 }
-                else if(bf->next != NULL && x == bf->num_chars) {
+                else if(bf->next != NULL && x == bf->num_chars-1) {
                     bf = bf->next;
                     x = 0;
                     move(++y, x);
@@ -176,59 +176,127 @@ int main(int argc, char *argv[]) {
 				break;
 
             case KEY_BACKSPACE:  // backspace
-
-                if(bf != NULL) {
-                    if(x != 0) {
-                        memmove(bf->line + x - 1, bf->line + x, bf->num_chars - x);
-                        bf->num_chars--;
-                        move(y, --x);
-                        loadwin(head, 0);
-                    }
-                    else if(y != 0 && x == 0) {
-
-                        if(bf->num_chars == 1) {
-                            buffer *temp2;
-                            temp2 = bf;
-                            while(temp2) {
-                                temp2->num_chars--;
-                                temp2 = temp2->next;
-                            }
-                            bf->next->prev = bf->prev;
-                            bf->prev->next = bf->next;
-                            temp2 = bf;
-                            bf = bf->prev;
-                            free(temp2->line);
-                            free(temp2);
-                            move(--y, x = bf->num_chars);
-                            loadwin(head, 0);
-                        }
-                        else if(bf->num_chars < (LINEMAX - (bf->prev->num_chars))) {
                 
-                            memmove(bf->prev->line + bf->prev->num_chars - 1, bf->line, bf->num_chars);
-                            x = bf->num_chars;
-                            bf->prev->num_chars = bf->prev->num_chars + bf->num_chars;
-                            buffer *temp2;
-                            temp2 = bf;
-                            while(temp2) {
-                                temp2->num_chars--;
-                                temp2 = temp2->next;
-                            }
-                            bf->next->prev = bf->prev;
-                            bf->prev->next = bf->next;
-                            temp2 = bf;
-                            bf = bf->prev;
-                            free(temp2->line);
-                            free(temp2);
-                            move(--y, x);
-                            loadwin(head, 0);
+                // if(bf != NULL) {
+                //     if(x != 0) {
+                //         memmove(bf->line + x - 1, bf->line + x, bf->num_chars - x);
+                //         bf->num_chars--;
+                //         move(y, --x);
+                //         loadwin(winStart, 0);
+                //     }
+                //     else if(y != 0 && x == 0) {
+
+                //         if(bf->num_chars == 1) {
+                //             buffer *temp2;
+                //             temp2 = bf;
+                //             while(temp2) {
+                //                 temp2->num_chars--;
+                //                 temp2 = temp2->next;
+                //             }
+                //             bf->next->prev = bf->prev;
+                //             bf->prev->next = bf->next;
+                //             temp2 = bf;
+                //             bf = bf->prev;
+                //             free(temp2->line);
+                //             free(temp2);
+                //             move(--y, x = bf->num_chars);
+                //             loadwin(winStart, 0);
+                //         }
+                //         else if(bf->num_chars < (LINEMAX - (bf->prev->num_chars))) {
+                
+                //             memmove(bf->prev->line + bf->prev->num_chars - 1, bf->line, bf->num_chars);
+                //             x = bf->num_chars;
+                //             bf->prev->num_chars = bf->prev->num_chars + bf->num_chars;
+                //             buffer *temp2;
+                //             temp2 = bf;
+                //             while(temp2) {
+                //                 temp2->num_chars--;
+                //                 temp2 = temp2->next;
+                //             }
+                //             bf->next->prev = bf->prev;
+                //             bf->prev->next = bf->next;
+                //             temp2 = bf;
+                //             bf = bf->prev;
+                //             free(temp2->line);
+                //             free(temp2);
+                //             move(--y, x);
+                //             loadwin(winStart, 0);
                      
-                        }
-                    }
-                    else if(x == 0, y == 0) {
-                        move(y, x);
-                        loadwin(head, 0);
-                    }
+                //         }
+                //     }
+                //     else if(x == 0, y == 0) {
+                //         move(y, x);
+                //         loadwin(winStart, 0);
+                //     }
+                // }
+                if(x == 0 && y == 0 && bf->prev == NULL) {
+                    move(y, x);
                 }
+                // else if(x == (bf->num_chars)) {
+                //     x--;
+                //     bf->line[bf->num_chars - 1] = '\0';
+                //     bf->num_chars--;
+                    
+                //     loadwin(winStart, 0);
+                //     move(y, x);
+                // }
+                else if((x>0) && x < bf->num_chars) {
+                    memmove(bf->line + x - 1, bf->line + x, bf->num_chars - x);
+                    bf->num_chars--;
+                    bf->cur_X = x;
+                    loadwin(winStart, 0);
+                    move(y, --x);
+
+
+                }
+                else if(x == 0 && y > 0 && (bf->prev->num_chars + bf->num_chars - 1) > LINEMAX) {
+                    memmove(bf->prev->line + bf->num_chars, bf->line, LINEMAX - bf->prev->num_chars);
+                    bf = bf->prev;
+                    x = bf->num_chars;
+                    y--;
+                    move(y, x);
+                    loadwin(winStart, 0);
+                }
+                else if(x == 0 && bf->prev != NULL && (bf->prev->num_chars + bf->num_chars - 1) < LINEMAX) {
+                    if(bf == winStart) {
+                        winStart = winStart->prev;
+                    }
+                    if(bf->prev->num_chars == 0) {
+                        bf->prev->line[0] = '\n';
+                        bf->prev->num_chars = 1;
+                    }
+                    memmove(bf->prev->line + bf->prev->num_chars - 1, bf->line, bf->num_chars);
+                    bf->prev->next = bf->next;
+                    if(bf->next != NULL) {
+                        bf->next->prev = bf;
+                    }
+                    x = bf->num_chars - 1;
+                    bf->prev->num_chars = bf->prev->num_chars + bf->num_chars - 1;
+                    buffer *temp = bf->prev;
+                    free(bf->line);
+                    free(bf);
+                    bf = temp;
+                    if(bf->next != NULL) {
+                        buf_Decr_lineno(bf->next, 1);
+                    }
+                    if(y == 0) {
+                        loadwin(winStart, 1);
+                        move(y, bf->cur_X = x = bf->num_chars-x-1);
+                    }
+                    else {
+                        y--;
+                        move(y, bf->cur_X = x = bf->num_chars - x - 1);
+                        loadwin(winStart, 0);
+                    }
+
+                }
+                else if(x == 0 && y == 0 && bf->prev == NULL && bf->num_chars == 0) {
+                    bf->line[0] = '\n';
+                    bf->num_chars = 1;
+                    move(y, x);
+                    loadwin(winStart, 0);
+                }
+
                 break;
 
             case 19: // ascii of ctrl + s
@@ -456,7 +524,7 @@ int main(int argc, char *argv[]) {
 
         }
         attron(COLOR_PAIR(1));
-        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d |", filename, bf->cur_line, x+1 );
+        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d |", filename, bf->cur_line + 1, x+1 );
         mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
         move(y, x);
         attroff(COLOR_PAIR(1));

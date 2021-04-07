@@ -113,11 +113,21 @@ int main(int argc, char *argv[]) {
                 if(bf->next == NULL && x == bf->num_chars-1) {
                     move(y, x);
                 }
-                else if(bf->next != NULL && x == bf->num_chars-1) {
+                else if(bf->next != NULL && x == bf->num_chars-1 && y < ht-2) {
                     bf = bf->next;
                     x = 0;
                     move(++y, x);
                 } 
+                else if(bf->next != NULL && x == bf->num_chars -1 && y == ht- 2){
+                    winStart = winStart -> next;
+                    bf = bf->next;
+                    x = 0;
+                    move(y, x);
+                    loadwin(winStart, 0);
+                }
+                else if(bf->next == NULL && bf->num_chars == 1){
+                    move(y, x);
+                }
                 else {
                     move(y, ++x);
                 }
@@ -146,6 +156,7 @@ int main(int argc, char *argv[]) {
                 else {
                     move(y, x);
                 }
+                // loadwin(winStart, 0); // just added to see bf->num_chars is works fine or not
                 break;
 
 
@@ -175,7 +186,7 @@ int main(int argc, char *argv[]) {
                     loadwin(winStart, 0);
                     move(y, x);
                 }
-				
+				//loadwin(winStart, 0); just added to see bf->num_chars works fine or not
 				break;
 
             case KEY_BACKSPACE:  // backspace

@@ -482,7 +482,7 @@ int main(int argc, char *argv[]) {
                     }
                 }
                 else if(x < bf->num_chars) {
-                    charInsert(bf, x, ch);
+                    charInsert(bf, ch, x);
                     // bf->num_chars++;
                     bufInsert_betw(bf);
                     memmove(bf->next->line, (bf->line + x + 1), bf->num_chars - x);

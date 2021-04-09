@@ -11,11 +11,12 @@
 
 int main(int argc, char *argv[]) {
 
-    int fd, newfile = 0, ht, wd, x , y, i = 0, ch, offY = 0, total_lines;
+    int fd, newfile = 0, ht, wd, x , y, i = 0, ch, offY = 0, total_lines, searchflag = 0, replaceflag = 0;
     char filename[255]; // max size of character is 255 in linux
+    char *pt = NULL;
     buffer *bf, *head, *st, *winStart;
     buffer *temp;
-    char search[LINEMAX];
+    char search[LINEMAX], replace[LINEMAX];
     init_buffer(&bf);
     if(argc == 2) {  // when filename is provided 
         strcpy(filename, argv[1]);
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]) {
         newfile = 1;  // used as a flag to create a new file
     }
     else {
-        printf("USAGE : ./editor <filename> or ./editor");
+        printf("USE : ./editor <filename> or ./editor");
         distroy_buffer(bf);
     }
 
@@ -508,17 +509,18 @@ int main(int argc, char *argv[]) {
                 move(ht-1, 0);
                 clrtoeol();
                 attron(COLOR_PAIR(1));
-                mvprintw(ht-1, 0, "Enter Word to Search : ");
-                mvscanw(ht-1, strlen("Enter Word to Search : "), "%s", search);
+                echo();
+                mvprintw(ht-1, 0, "Enter String to Search : ");
+                mvscanw(ht-1, strlen("Enter String to Search : "), "%s", search);
                 refresh();
                 noecho();
                 char *pt = NULL;
-                while(temp->next != NULL) {
-                    int flag = 0;
+                while(temp != NULL) {
+                    searchflag = 0;
                     x = 0;
                     pt = strstr(temp->line, search);
                     if(pt != NULL) {
-                        flag = 1;
+                        searchflag = 1;
                         x = pt - temp->line;
                         temp->cur_X = x;
                         bf = temp;
@@ -537,8 +539,93 @@ int main(int argc, char *argv[]) {
                     }
                     temp = temp->next;
                 }
+                if(searchflag == 0) {
+                    mvprintw(ht - 1, 0, "No such string found :( ");
+                    getch();
+                    refresh;
+                }
                 break;
-                
+
+            case 18: // ctrl + R -------- (Search and Replace)
+            case KEY_F(6):
+
+                temp = head;
+                move(ht-1, 0);
+                clrtoeol();
+                attron(COLOR_PAIR(1));
+                echo();
+                mvprintw(ht-1, 0, "Enter String to Search : ");
+                mvscanw(ht-1, strlen("Enter String to Search : "), "%s", search);
+                clrtoeol();
+                mvprintw(ht-1, 0, "Enter Replace String : ");
+                mvscanw(ht-1, strlen("Enter Replace String : "), "%s", replace);
+                refresh();
+                noecho();
+                pt = NULL;
+                while(temp != NULL) {
+                    searchflag = 0;
+                    x = 0;
+                    pt = strstr(temp->line, search);
+                    if(pt != NULL) {
+                        searchflag = 1;
+                        x = pt - temp->line;
+                        temp->cur_X = x;
+                        bf = temp;
+                        attroff(COLOR_PAIR(1));
+                        if(temp->cur_line - winStart->cur_line >= 0 && temp->cur_line - winStart->cur_line < ht - 1) {
+                            y = temp->cur_line - winStart->cur_line;
+                            move(y, x);
+                            loadwin(winStart, 0);
+                        }
+                        else {
+                            y = 0;
+                            winStart = temp;
+                            loadwin(winStart, 0);
+                        }
+                        attron(COLOR_PAIR(1));
+                        move(ht - 1, 0);
+                        clrtoeol();
+                        echo();
+                        mvprintw(ht - 1, 0, "Press enter to replace the given string ");
+                        noecho();
+                        move(y, x);
+                        refresh();
+                        if((ch = getch())) {
+                            if(ch == '\n' && (x + strlen(replace) - 1) < LINEMAX) {
+                                replaceflag = 1;
+                                //to remove the given search
+                                for(i = 0; i < strlen(search); i++) {
+                                    memmove(bf->line + x, bf->line + x + 1, bf->num_chars - x - 1);
+                                    (bf->num_chars)--;
+                                }
+                                printf("niki");
+                                //to insert the replace string
+                                for(i = 0; i < strlen(replace); i++) {
+                                    charInsert(bf, replace[i], x+i);
+                                }
+
+                                attroff(COLOR_PAIR(1));
+                                loadwin(winStart, 0);
+
+                            }
+                            else {
+                                replaceflag = 0;
+                                move(y, x);
+                            }
+                        }
+                        break;
+                    }
+                    temp = temp->next;
+                }
+                if(replaceflag == 0) {
+                    mvprintw(ht - 1, 0, "String is not replaced :( ");
+                    getch();
+                    refresh;
+                }
+
+                break;
+
+
             
             default :
                 // if(i < LINEMAX) {

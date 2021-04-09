@@ -625,6 +625,17 @@ int main(int argc, char *argv[]) {
 
                 break;
 
+            case 24: // ctrl + X
+            case KEY_F(7): //------- cut a string
+                move(ht-1, 0);
+                attron(COLOR_PAIR(1));
+                clrtoeol();
+                mvprintw(ht-1, 0, "To Select = Right Arrow || To Deselect = Left Arrow || To Cut : Press Enter");
+                getch();
+                clrtoeol();
+                attroff(COLOR_PAIR(1));
+                
+                break;
 
             
             default :

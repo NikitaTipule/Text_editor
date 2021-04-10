@@ -77,13 +77,13 @@ int main(int argc, char *argv[]) {
 	refresh();
     loadwin(bf, 0);
     attron(COLOR_PAIR(1));
-	mvprintw(ht - 1, 0, "| filename: %s | row : %d | col: %d | num_chars : %d", filename, bf->cur_line + 1, x+1, bf->num_chars );
+	mvprintw(ht - 1, 0, "| filename: %s | row : %d | col: %d | num_chars : %d | copy : %s", filename, bf->cur_line + 1, x+1, bf->num_chars, copy );
     mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
 	move(y, x);
 	attroff(COLOR_PAIR(1));
 	refresh();
 	move(0, 0);
-
+    memset(copy, '\0', LINEMAX);
     head = bf, st = bf, winStart = bf;
     while(ch = getch()) {
 
@@ -743,6 +743,30 @@ int main(int argc, char *argv[]) {
                 move(y, x);
                 break;
 
+            case 22:     // ascii of ctrl + v
+            case KEY_F(9): //---------- paste a string
+                attron(COLOR_PAIR(1));
+                move(ht-1, 0);
+                clrtoeol();
+                echo();
+                mvprintw(ht-1, 0, "To Paste : Press Enter");
+                
+                attroff(COLOR_PAIR(1));
+                refresh();
+                noecho();
+                move(y, x);
+                if((ch = getch()) != ERR) {
+                    if(ch == '\n' && strlen(copy) > 0 && (bf->num_chars + strlen(copy)) < LINEMAX - 1) {
+                        for(i = 0; i < strlen(copy); i++) {
+                            // memmove(bf->line + x + 1, bf->line + x, bf->num_chars - x);
+                            charInsert(bf, copy[i], x);
+                            x++;
+                        }
+                    }
+                }
+                loadwin(winStart, 0);
+                move(y, x);
+                break;
             
             default :
                 // if(i < LINEMAX) {

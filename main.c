@@ -688,7 +688,60 @@ int main(int argc, char *argv[]) {
                 break;
 
                 //**************************************
-                
+
+            case 3:   // Ascii of ctrl + c 
+            case KEY_F(8): //--------- COPY selected string
+                attron(COLOR_PAIR(1));
+                move(ht-1, 0);
+                clrtoeol();
+                echo();
+                mvprintw(ht-1, 0, "To Select: Right | To Deselect: Left | To Cut: Enter");
+                attroff(COLOR_PAIR(1));
+                refresh();
+                noecho();
+                move(y, x);
+                select = x;
+                cpy = 0;
+                memset(copy, '\0', LINEMAX);
+                while(ch = getch()) {
+                    if(ch == KEY_RIGHT && x < LINEMAX - 1 && x < bf->num_chars - 1){
+                        copy[cpy++] = bf->line[x];
+                        addch(bf->line[x] | A_STANDOUT);
+                        move(y, x++);
+                    }
+                    else if(ch == KEY_LEFT && x >= 0 && x > select) {
+                        move(y, --x);
+                        copy[--cpy] = '\0';
+                        addch(bf->line[x] | A_NORMAL);
+                        
+                    }
+                    else if(ch == '\n') {
+                        x = select;
+                        // for(i = 0; i< strlen(copy); i++) {
+                        //     memmove(bf->line + x, bf->line + x + 1, bf->num_chars - x - 1);
+                        //     bf->num_chars--;
+                        // }
+                        i=0;
+                        loadwin(winStart, 0);
+                        move(y, x);
+                        break;
+                    }
+                    else {
+                        loadwin(winStart, 0);
+                        memset(copy, '\0', LINEMAX);
+                        move(y, x = select);
+                        break;
+                    }
+                    move(ht - 1, 0);
+                    clrtoeol();
+                    attron(COLOR_PAIR(1));
+                    mvprintw(ht-1, 0, " \"%s\" |To Select: Right | To Deselect: Left | To Copy: Enter", copy);
+                    attroff(COLOR_PAIR(1));
+                    refresh();
+                    move(y, x);
+                }
+                move(y, x);
+                break;
 
             
             default :
@@ -739,8 +792,8 @@ int main(int argc, char *argv[]) {
         attron(COLOR_PAIR(1));
         move(ht-1, 0);
         clrtoeol();
-        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d | num_chars = %d | x : %d", filename, bf->cur_line + 1, x+1, bf->num_chars, x );
-        mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
+        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d | num_chars = %d | x : %3d | Copy : %s", filename, bf->cur_line + 1, x+1, bf->num_chars, x, copy );
+        // mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
         move(y, x);
         attroff(COLOR_PAIR(1));
         refresh();

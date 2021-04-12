@@ -7,11 +7,13 @@
 #include"gui.h"
 #include<unistd.h>
 #include<ncurses.h>
+extern int total_lines;
+
 
 
 int main(int argc, char *argv[]) {
 
-    int fd, newfile = 0, ht, wd, x , y, i = 0, ch, offY = 0, total_lines, searchflag = 0, replaceflag = 0, cpy = 0, select = 0;
+    int fd, newfile = 0, ht, wd, x , y, i = 0, ch, offY = 0, searchflag = 0, replaceflag = 0, cpy = 0, select = 0, no = 0;
     char filename[255]; // max size of character is 255 in linux
     char *pt = NULL;
     buffer *bf, *head, *st, *winStart;
@@ -35,6 +37,7 @@ int main(int argc, char *argv[]) {
     }
     else if(argc == 1) { // when filename is not provided then start an empty buffer and then insert character into that buffer
         newfile = 1;  // used as a flag to create a new file
+        total_lines++;
     }
     else {
         printf("USE : ./editor <filename> or ./editor");
@@ -359,25 +362,46 @@ int main(int argc, char *argv[]) {
                 endwin();
                 exit(0);
 
-            // case  : //ctrl + G
-            //     move(ht-1, 0);
-            //     clrtoeol();
-            //     attron(COLOR_PAIR(1));
-            //     mvprintw(ht-1, 0, "Enter Line number : ");
-            //     mvscanw(ht-1, strlen("Enter file name : "), "%d", filename);
-            //     attroff(COLOR_PAIR(1));
-            //     refresh();
-            //         if((fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU)) == -1) {
-            //             printf("Error :(");
-            //             return 0;
-            //         }
-            //         newfile = 0;
-            //         loadwin(head, 0);
-            //         move(y, x);
-                
-               
-                
+            case 7: //ctrl + G
+            case KEY_F(11): // Go to line number
 
+                move(ht-1, 0);
+                clrtoeol();
+                echo();
+                attron(COLOR_PAIR(1));
+                mvprintw(ht-1, 0, "Enter Line number : ");
+                mvscanw(ht-1, strlen("Enter Line Number : "), "%d", &no);
+                noecho();
+                attroff(COLOR_PAIR(1));
+                refresh();
+                if(no > total_lines) {
+                    move(ht-1, 0);
+                    clrtoeol();
+                    attron(COLOR_PAIR(1));
+                    mvprintw(ht-1, 0, "No such line exits :(");
+                    getch();
+                    move(y, x);
+                }
+                else {
+                    temp = head;
+                    while((temp->cur_line + 1) != no) {
+                        temp = temp->next;
+                    }
+                    bf = temp;
+                    y = temp->cur_line;
+                    x = 0;
+                    if(y < ht - 2) {
+                        move(y, x);
+                    }
+                    else {
+                        y = 0;
+                        winStart = bf;
+                        loadwin(winStart, 0);
+                        move(y, x);
+                    }
+                }
+                break;
+               
             case '\n' :
                 // if(x == bf->num_chars && bf->next == NULL) {
                     // buf_create_next(bf); // created next buffer
@@ -500,6 +524,7 @@ int main(int argc, char *argv[]) {
                     move(y, x);
                     loadwin(winStart, 0);
                 }
+                total_lines++;
 				break;
 
 
@@ -767,6 +792,10 @@ int main(int argc, char *argv[]) {
                 loadwin(winStart, 0);
                 move(y, x);
                 break;
+
+
+                
+
             
             default :
                 // if(i < LINEMAX) {
@@ -808,15 +837,15 @@ int main(int argc, char *argv[]) {
                     charInsert(bf, ch, x++);
                     move(++y, x);
                     loadwin(winStart, 0);
-                }
-                total_lines++;
+                    total_lines++;
 
+                }
 
         }
         attron(COLOR_PAIR(1));
         move(ht-1, 0);
         clrtoeol();
-        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d | num_chars = %d | x : %3d | Copy : %s", filename, bf->cur_line + 1, x+1, bf->num_chars, x, copy );
+        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d | num_chars = %d | x : %3d | Copy : %s | lines: %3d", filename, bf->cur_line + 1, x+1, bf->num_chars, x, copy , total_lines);
         // mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
         move(y, x);
         attroff(COLOR_PAIR(1));

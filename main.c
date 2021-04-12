@@ -5,6 +5,7 @@
 #include<errno.h> 
 #include"buffer.h"
 #include"gui.h"
+#include"stack.h"
 #include<unistd.h>
 #include<ncurses.h>
 extern int total_lines;
@@ -14,11 +15,13 @@ extern int total_lines;
 int main(int argc, char *argv[]) {
 
     int fd, newfile = 0, ht, wd, x , y, i = 0, ch, offY = 0, searchflag = 0, replaceflag = 0, cpy = 0, select = 0, no = 0;
+    int flag = 0, j = 0; // 0 for push and 1 for pop
+    stack un, re;
     char filename[255]; // max size of character is 255 in linux
     char *pt = NULL;
     buffer *bf, *head, *st, *winStart;
     buffer *temp;
-    char search[LINEMAX], replace[LINEMAX], copy[LINEMAX];
+    char search[LINEMAX], replace[LINEMAX], copy[LINEMAX], string[LINEMAX];
     init_buffer(&bf);
     if(argc == 2) {  // when filename is provided 
         strcpy(filename, argv[1]);
@@ -254,6 +257,9 @@ int main(int argc, char *argv[]) {
                         move(y, bf->cur_X = x = bf->num_chars - x - 1);
                         loadwin(winStart, 0);
                     }
+                    
+                    total_lines--;
+
 
                 }
                 else if(x == 0 && y == 0 && bf->prev == NULL && bf->num_chars == 0) {
@@ -267,6 +273,7 @@ int main(int argc, char *argv[]) {
 
             case 19: // ascii of ctrl + s
             case KEY_F(2): 
+                loadwin(winStart, 0);
                 move(ht-1, 0);
                 clrtoeol();
                 if(newfile == 1) {
@@ -364,7 +371,7 @@ int main(int argc, char *argv[]) {
 
             case 7: //ctrl + G
             case KEY_F(11): // Go to line number
-
+                // loadwin(winStart, 0);
                 move(ht-1, 0);
                 clrtoeol();
                 echo();
@@ -384,16 +391,24 @@ int main(int argc, char *argv[]) {
                 }
                 else {
                     temp = head;
+                    i = 0;
                     while((temp->cur_line + 1) != no) {
                         temp = temp->next;
                     }
                     bf = temp;
                     y = temp->cur_line;
                     x = 0;
-                    if(y < ht - 2) {
+                    if(y < ht - 2 && winStart->cur_line <= y) {
+                        move(y, x);
+                    }
+                    else if(y < ht - 2 && winStart->cur_line > y) {
+                        winStart = bf;
+                        y = 0;
+                        x = 0;
                         move(y, x);
                     }
                     else {
+                        
                         y = 0;
                         winStart = bf;
                         loadwin(winStart, 0);
@@ -530,6 +545,7 @@ int main(int argc, char *argv[]) {
 
             case 6: //ascii of ctrl + F  ----- (search)
             case KEY_F(5): 
+                loadwin(winStart, 0);
                 temp = head;
                 move(ht-1, 0);
                 clrtoeol();
@@ -576,7 +592,7 @@ int main(int argc, char *argv[]) {
 
             case 18: // ctrl + R -------- (Search and Replace)
             case KEY_F(6):
-
+                loadwin(winStart, 0);
                 temp = head;
                 move(ht-1, 0);
                 clrtoeol();
@@ -592,6 +608,7 @@ int main(int argc, char *argv[]) {
                 pt = NULL;
                 while(temp != NULL) {
                     searchflag = 0;
+                    replaceflag = 0;
                     x = 0;
                     pt = strstr(temp->line, search);
                     if(pt != NULL) {
@@ -626,7 +643,6 @@ int main(int argc, char *argv[]) {
                                     memmove(bf->line + x, bf->line + x + 1, bf->num_chars - x - 1);
                                     (bf->num_chars)--;
                                 }
-                                printf("niki");
                                 //to insert the replace string
                                 for(i = 0; i < strlen(replace); i++) {
                                     charInsert(bf, replace[i], x+i);
@@ -658,7 +674,7 @@ int main(int argc, char *argv[]) {
 
             case 24: // ctrl + X
             case KEY_F(7): //------- cut a string
-                
+                loadwin(winStart, 0);
                 attron(COLOR_PAIR(1));
                 move(ht-1, 0);
                 clrtoeol();
@@ -716,6 +732,7 @@ int main(int argc, char *argv[]) {
 
             case 3:   // Ascii of ctrl + c 
             case KEY_F(8): //--------- COPY selected string
+                loadwin(winStart, 0);
                 attron(COLOR_PAIR(1));
                 move(ht-1, 0);
                 clrtoeol();
@@ -770,6 +787,7 @@ int main(int argc, char *argv[]) {
 
             case 22:     // ascii of ctrl + v
             case KEY_F(9): //---------- paste a string
+                loadwin(winStart, 0);
                 attron(COLOR_PAIR(1));
                 move(ht-1, 0);
                 clrtoeol();
@@ -819,6 +837,7 @@ int main(int argc, char *argv[]) {
                 // total_lines++;
                 // break;
                 if(x < LINEMAX && bf->num_chars <= LINEMAX) {
+                    // string[j] = ch;
                     charInsert(bf, ch, x++);
                     move(y, x);
                     loadwin(winStart, 0);
@@ -831,6 +850,7 @@ int main(int argc, char *argv[]) {
                 //     loadwin(winStart, 0);
                 // }
                 else {
+                    // push(bf, strlen(string) - x, &s, 0, string);
                     buf_create_next(bf);
                     bf= bf->next;
                     x = 0;

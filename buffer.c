@@ -7,7 +7,7 @@
 #include<ncurses.h>
 #include<unistd.h>
 #include"gui.h"
-
+int total_lines;
 
 // Function to initialize a buffer
 void init_buffer(buffer **bf) {
@@ -87,6 +87,8 @@ void buffer_load(int fd, buffer *bf) {
         }
         i++;
     }
+    total_lines = linenumber;
+    return;
 }
 
 // implimented to check that is the buffer loads all the characters into it from an existing file . for testing purpose only.

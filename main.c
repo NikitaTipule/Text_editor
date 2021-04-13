@@ -843,8 +843,14 @@ int main(int argc, char *argv[]) {
                 move(y, x);
                 break;
 
+            // Home key will move the cursor to the beginning of the line
+            case KEY_HOME:
+                x = 0;
+                bf->cur_X = 0;
+                move(y, x);
+                break;
 
-                
+    
 
             
             default :

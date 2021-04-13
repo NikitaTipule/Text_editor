@@ -857,6 +857,19 @@ int main(int argc, char *argv[]) {
                 move(y , x);
                 break;
 
+            case KEY_PPAGE:
+                temp = winStart;
+                for(i = 0;temp->prev != NULL && i < ht - 1; i++) {
+                    temp = temp->prev;
+                }
+                winStart = temp;
+                bf = temp;
+                x = 0;
+                y = 0;
+                move(y, x);
+                loadwin(winStart, 0);
+                break;
+
             
             default :
                 // if(i < LINEMAX) {

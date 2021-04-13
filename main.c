@@ -850,7 +850,12 @@ int main(int argc, char *argv[]) {
                 move(y, x);
                 break;
 
-    
+            // End key will move the cursor position to the end of the line
+            case KEY_END:
+                x = bf->num_chars - 1;
+                bf->cur_X = x;
+                move(y , x);
+                break;
 
             
             default :

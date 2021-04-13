@@ -406,6 +406,7 @@ int main(int argc, char *argv[]) {
                         y = 0;
                         x = 0;
                         move(y, x);
+                        loadwin(winStart, 0);
                     }
                     else {
                         

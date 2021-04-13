@@ -870,6 +870,18 @@ int main(int argc, char *argv[]) {
                 loadwin(winStart, 0);
                 break;
 
+            case KEY_NPAGE:
+                temp = winStart;
+                for(i = 0; temp->next != NULL && i < ht - 1; i++) {
+                    temp = temp->next;
+                }
+                winStart = temp;
+                bf = temp;
+                x = 0; y = 0;
+                move(y, x);
+                loadwin(winStart, 0);
+                break;
+
             
             default :
                 // if(i < LINEMAX) {

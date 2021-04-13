@@ -15,9 +15,9 @@ extern int total_lines;
 int main(int argc, char *argv[]) {
 
     int fd, newfile = 0, ht, wd, x , y, i = 0, ch, offY = 0, searchflag = 0, replaceflag = 0, cpy = 0, select = 0, no = 0;
-    int flag = 0, j = 0; // 0 for push and 1 for pop
-    stack un, re;
-    char filename[255]; // max size of character is 255 in linux
+    // int flag = 0, j = 0; // 0 for push and 1 for pop
+    // stack un, re;
+    char filename[255]; // max size of filename in linux is 255
     char *pt = NULL;
     buffer *bf, *head, *st, *winStart;
     buffer *temp;
@@ -296,13 +296,44 @@ int main(int argc, char *argv[]) {
                 bufSave(fd, head);
                 break;
             
-            // case KEY_DC :   // delete a character
-            //     if(bf->next == NULL && y == bf->cur_line && x == bf->num_chars - 1) {
-            //         move(x, y);
-            //         loadwin(head, 0);
-            //         break;
-            //     }
-            //     break;
+            case KEY_DC :   // delete a character
+                
+                if(x == bf->num_chars && bf->next == NULL) {
+                    move(y, x);
+                }
+                else if(x < bf->num_chars - 1) {
+                    memmove(bf->line + x, bf -> line + x + 1, bf->num_chars - x );
+                    bf->num_chars--;
+                    move(y, x);
+                    loadwin(winStart, 0);
+                }
+                else if(x == bf->num_chars - 1 && bf->next != NULL) {
+                    if((bf->num_chars + bf->next->num_chars - 1) > LINEMAX) {
+                        move(y, x);
+                    }
+                    else if((bf->num_chars + bf->next->num_chars - 1) < LINEMAX) {
+                        memmove(bf->line + x, bf->next->line, bf->next->num_chars);
+                        bf->num_chars = bf->num_chars + bf->next->num_chars - 1;
+                        temp = bf->next;
+                        if(bf->next->next != NULL) {
+                            bf->next->next->prev = bf;
+                            bf->next = temp->next;
+                        }
+                        else {
+                            bf->next = NULL;
+                        }
+                        free(temp->line);
+                        free(temp);
+                        if(bf->next != NULL) {
+                            buf_Decr_lineno(bf->next, 1);
+                        }
+                        total_lines--;
+                        move(y, x);
+                        loadwin(winStart, 0);
+                    }
+                }
+                 
+                break;
 
 
             case 8: // ascii of ctrl + h

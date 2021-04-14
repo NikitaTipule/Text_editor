@@ -2,6 +2,7 @@
 #include"gui.h"
 #include<ncurses.h>
 
+// Function to initialize window
 void init_window() {
     initscr();
     raw();
@@ -12,7 +13,7 @@ void init_window() {
     init_pair(3, COLOR_WHITE, COLOR_BLACK);
 }
 
-
+// Function to display contents of buffer on window
 void loadwin(buffer *bf, int y) {
     clear();
     refresh();

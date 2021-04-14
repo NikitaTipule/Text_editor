@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
     buffer *bf, *head, *st, *winStart;
     buffer *temp;
     char search[LINEMAX], replace[LINEMAX], copy[LINEMAX], string[LINEMAX];
+    memset(copy, '\0', LINEMAX);
     init_buffer(&bf);
     if(argc == 2) {  // when filename is provided 
         strcpy(filename, argv[1]);
@@ -86,7 +87,6 @@ int main(int argc, char *argv[]) {
 	attroff(COLOR_PAIR(1));
 	refresh();
 	move(0, 0);
-    memset(copy, '\0', LINEMAX);
     head = bf, st = bf, winStart = bf;
     while(ch = getch()) {
 
@@ -679,7 +679,7 @@ int main(int argc, char *argv[]) {
                 move(ht-1, 0);
                 clrtoeol();
                 echo();
-                mvprintw(ht-1, 0, "To Select: Right | To Deselect: Left | To Cut: Enter");
+                mvprintw(ht-1, 0, "To Select: Right | To Deselect: Left | To Copy: Enter");
                 attroff(COLOR_PAIR(1));
                 refresh();
                 noecho();

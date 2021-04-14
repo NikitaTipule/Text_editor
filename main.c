@@ -5,7 +5,6 @@
 #include<errno.h> 
 #include"buffer.h"
 #include"gui.h"
-#include"stack.h"
 #include<unistd.h>
 #include<ncurses.h>
 extern int total_lines;
@@ -15,8 +14,6 @@ extern int total_lines;
 int main(int argc, char *argv[]) {
 
     int fd, newfile = 0, ht, wd, x , y, i = 0, ch, offY = 0, searchflag = 0, replaceflag = 0, cpy = 0, select = 0, no = 0;
-    // int flag = 0, j = 0; // 0 for push and 1 for pop
-    // stack un, re;
     char filename[255]; // max size of filename in linux is 255
     char *pt = NULL;
     buffer *bf, *head, *st, *winStart;
@@ -51,7 +48,7 @@ int main(int argc, char *argv[]) {
 
 
     getmaxyx(stdscr, ht, wd); // ht = heigth , wd = width
-    keypad(stdscr, TRUE);
+    keypad(stdscr, TRUE); // enable keyboard input on terminal
     mvprintw(ht/2 - 12, wd/2 - 19, "-------------------------------------");
     mvprintw(ht/2 - 11, wd/2 - 20, "|                                     |");
     attron(COLOR_PAIR(1));
@@ -83,7 +80,7 @@ int main(int argc, char *argv[]) {
 	refresh();
     loadwin(bf, 0);
     attron(COLOR_PAIR(1));
-	mvprintw(ht - 1, 0, "| filename: %s | row : %d | col: %d | num_chars : %d | copy : %s", filename, bf->cur_line + 1, x+1, bf->num_chars, copy );
+	mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d | Copy : %s | total lines: %3d", filename, bf->cur_line + 1, x+1, copy , total_lines);
     mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
 	move(y, x);
 	attroff(COLOR_PAIR(1));
@@ -203,12 +200,7 @@ int main(int argc, char *argv[]) {
                 if(x == 0 && y == 0 && bf->prev == NULL) {
                     move(y, x);
                 }
-                // else if(x == (bf->num_chars - 1)) {
-                //     bf->line[x] = '\0';
-                //     bf->num_chars--;
-                //     move(y, --x);
-                //     loadwin(winStart, 0);
-                // }
+                
                 else if((x>0) && x <= bf->num_chars) {
                     memmove(bf->line + x - 1, bf->line + x, bf->num_chars - x + 1);
                     bf->num_chars--;
@@ -336,7 +328,7 @@ int main(int argc, char *argv[]) {
                 break;
 
 
-            case 8: // ascii of ctrl + h
+            case 8: // ascii of ctrl + h : Show Help window
             case KEY_F(10):
                 clear();
                 mvprintw(ht/2 - 12, wd/2 - 19, "-------------------------------------");
@@ -402,7 +394,6 @@ int main(int argc, char *argv[]) {
 
             case 7: //ctrl + G
             case KEY_F(11): // Go to line number
-                // loadwin(winStart, 0);
                 move(ht-1, 0);
                 clrtoeol();
                 echo();
@@ -449,89 +440,8 @@ int main(int argc, char *argv[]) {
                 }
                 break;
                
-            case '\n' :
-                // if(x == bf->num_chars && bf->next == NULL) {
-                    // buf_create_next(bf); // created next buffer
-                    // charInsert(bf, ch, x);
-                    // i = 0;
-                    // bf = bf->next;
-                    // // charInsert(bf, ch, 0);
-                    // x = 0;
-                    // move(++y, x);
-                    // loadwin(head, 0);
-                // }
-                // else if(bf -> next == NULL) {
-                //     buf_create_next(bf);
-                //     charInsert(bf, ch, x);
-                //     i = 0;
-                //     memmove(bf->next->line + x, bf->line + x, bf->num_chars - x);
-                //     memset(bf->line + x, '\0', bf->num_chars - x);
-                //     bf->num_chars = bf->num_chars - x;
-                //     bf = bf -> next;
-                //     x = 0;
-                //     y++;
-                //     move(y, x);
-                //     loadwin(head, 0);
-                // }
-                // else {
-                //     buffer *temp;
-                //     temp = bf->next;
-                //     buf_create_next(bf);
-                //     temp->prev = bf->next;
-                //     memmove(bf->next->line + x, bf->line + x, bf->num_chars - x);
-                //     memset(bf->line, '\0', bf->num_chars - x);
-                //     bf = bf->next;
-                //     while(temp) {
-                //         temp->cur_line + 1;
-                //         temp = temp->next;
-                //     }
-                //     x = 0;
-                //     y++;
-                //     move(y, x);
-                //     loadwin(head, 0);
-                // }
-                // break;
-                //*******************************
-                // bf->cur_X = x;
-				// charInsert(bf, bf->cur_X, ch);
-				// if(x < bf->num_chars -1){
-				// 	bufInsert_betw(bf);
-				// 	memmove(bf->next->line, (bf->line + x + 1), bf->num_chars - x + 1);
-				// 	memset((bf->line + x + 1), '\0', bf->num_chars - x);
-				// 	bf->next->num_chars = bf->num_chars - x - 1;
-				// 	bf->num_chars = x + 1;
-				// 	bf = bf->next;
-				// 	if(y < ht - 2)
-				// 		move(++y, x = 0);
-				// 	else{
-				// 		if(winStart->next != NULL){
-				// 			winStart = winStart->next;
-				// 			offY++;
-				// 		}
+            case '\n' : // Enter
 
-				// 		move(y = ht - 2, x = 0);
-				// 	}
-				// 	loadwin(winStart, 0);
-
-
-				// }
-				// else if(x == bf->num_chars || x == bf->num_chars - 1){
-				// 	bufInsert_betw(bf);
-				// 	clear();
-				// 	loadwin(winStart, 0);					
-				// 	bf = bf->next;
-				// 	if(y < ht - 2)
-				// 		move(++y, x = 0);
-				// 	else{
-				// 		if(winStart->next != NULL){
-				// 			winStart = winStart->next;
-				// 			offY++;
-				// 		}
-
-				// 		move(y = ht - 2, x = 0);
-				// 	}
-				// 	loadwin(winStart, 0);
-				// }
                 if(x == bf->num_chars-1 || x == bf->num_chars) {
                     bufInsert_betw(bf);
                     bf->line[x] = '\n';
@@ -760,7 +670,7 @@ int main(int argc, char *argv[]) {
                 move(y, x);
                 break;
 
-                //**************************************
+        
 
             case 3:   // Ascii of ctrl + c 
             case KEY_F(8): //--------- COPY selected string
@@ -791,10 +701,6 @@ int main(int argc, char *argv[]) {
                     }
                     else if(ch == '\n') {
                         x = select;
-                        // for(i = 0; i< strlen(copy); i++) {
-                        //     memmove(bf->line + x, bf->line + x + 1, bf->num_chars - x - 1);
-                        //     bf->num_chars--;
-                        // }
                         i=0;
                         loadwin(winStart, 0);
                         move(y, x);
@@ -833,7 +739,6 @@ int main(int argc, char *argv[]) {
                 if((ch = getch()) != ERR) {
                     if(ch == '\n' && strlen(copy) > 0 && (bf->num_chars + strlen(copy)) < LINEMAX - 1) {
                         for(i = 0; i < strlen(copy); i++) {
-                            // memmove(bf->line + x + 1, bf->line + x, bf->num_chars - x);
                             charInsert(bf, copy[i], x);
                             x++;
                         }
@@ -857,6 +762,7 @@ int main(int argc, char *argv[]) {
                 move(y , x);
                 break;
 
+            // Page Up - Previous page
             case KEY_PPAGE:
                 temp = winStart;
                 for(i = 0;temp->prev != NULL && i < ht - 1; i++) {
@@ -870,6 +776,7 @@ int main(int argc, char *argv[]) {
                 loadwin(winStart, 0);
                 break;
 
+            // Page Down - Next Page
             case KEY_NPAGE:
                 temp = winStart;
                 for(i = 0; temp->next != NULL && i < ht - 1; i++) {
@@ -884,57 +791,21 @@ int main(int argc, char *argv[]) {
 
             
             default :
-                // if(i < LINEMAX) {
-                //     charInsert(bf, ch, x++);
-                //     move(bf->cur_line, x);
-                //     loadwin(winStart, 0);
-                // }
-                // else {
-                    
-                //     buf_create_next(bf); // created next buffer
-                //     i = 0;
-                //     bf->next->prev = bf;
-                //     bf = bf->next;
-                //     bf->cur_line = bf->prev->cur_line + 1;
-                //     bf->line[i] = ch;
-                //     bf->num_chars = i;
-                //     bf->cur_X = ++i;
-                //     move(bf->cur_line, x);
-                //     loadwin(winStart, 0);
-                // }
-                // total_lines++;
-                // break;
-                if(x < LINEMAX && bf->num_chars <= LINEMAX) {
-                    // string[j] = ch;
+                if(x < LINEMAX-1 && bf->num_chars < LINEMAX) {
                     charInsert(bf, ch, x++);
                     move(y, x);
                     loadwin(winStart, 0);
-                }
-                // else if(x < LINEMAX && bf->num_chars >= LINEMAX && (bf->next != NULL)) {
-                //     memmove(bf->next->line+1,bf->line, 1);
-                //     bf->next->line[0] = bf->line[LINEMAX];
-                //     bf->next->num_chars++;
-                //     move(y, x++);
-                //     loadwin(winStart, 0);
-                // }
-                else {
-                    // push(bf, strlen(string) - x, &s, 0, string);
-                    buf_create_next(bf);
-                    bf= bf->next;
-                    x = 0;
-                    charInsert(bf, ch, x++);
-                    move(++y, x);
-                    loadwin(winStart, 0);
-                    total_lines++;
 
                 }
+               
+                break;
 
         }
         attron(COLOR_PAIR(1));
         move(ht-1, 0);
         clrtoeol();
-        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d | num_chars = %d | x : %3d | Copy : %s | lines: %3d", filename, bf->cur_line + 1, x+1, bf->num_chars, x, copy , total_lines);
-        // mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
+        mvprintw(ht - 1, 0, "| filename: %s | row : %3d | col: %3d | Copy : %s | total lines: %3d", filename, bf->cur_line + 1, x+1, copy , total_lines);
+        mvprintw(ht - 1, wd - 35, "| help : Press ctrl + h or F(10) |");
         move(y, x);
         attroff(COLOR_PAIR(1));
         refresh();

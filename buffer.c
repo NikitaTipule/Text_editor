@@ -50,6 +50,7 @@ void buf_create_next(buffer *bf) {
     Lineinit(bf);
 }
 
+// Function to load a buffer from existing file
 void buffer_load(int fd, buffer *bf) {
     char ch;
     int err, linenumber = 0, i = 0;
@@ -141,7 +142,7 @@ void charInsert(buffer *bf, char ch, int loc) {
     }
 }
 
-
+// Function to save buffer content into file
 void bufSave(int fd, buffer *bf) {    
     while(bf != NULL) {
         if(write(fd, bf->line, bf->num_chars) == -1) {
@@ -171,6 +172,7 @@ void buf_Decr_lineno(buffer *bf, int no) {
     (temp->cur_line)--;
 }
 
+// Function to insert line between two lines or next line
 void bufInsert_betw(buffer *bf) {
     if(bf->next == NULL) {
         buf_create_next(bf);

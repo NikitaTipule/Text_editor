@@ -2,13 +2,12 @@
 
 
 typedef struct buffer {
-    struct buffer *prev;
-    struct buffer *next;
-
     int cur_line;
     int num_chars;
     int cur_X;
     char *line;
+    struct buffer *prev;
+    struct buffer *next;
 }buffer;
 
 void init_buffer(buffer **bf);

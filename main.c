@@ -88,6 +88,7 @@ int main(int argc, char *argv[]) {
 	refresh();
 	move(0, 0);
     head = bf, st = bf, winStart = bf;
+
     while(ch = getch()) {
 
 
@@ -269,10 +270,12 @@ int main(int argc, char *argv[]) {
                 move(ht-1, 0);
                 clrtoeol();
                 if(newfile == 1) {
+                    echo();
                     attron(COLOR_PAIR(1));
                     mvprintw(ht-1, 0, "Enter file name : ");
                     mvscanw(ht-1, strlen("Enter file name : "), "%s", filename);
                     attroff(COLOR_PAIR(1));
+                    noecho();
                     refresh();
                     if((fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU)) == -1) {
                         printf("Error :(");
@@ -365,10 +368,12 @@ int main(int argc, char *argv[]) {
                 move(ht-1, 0);
                 clrtoeol();
                 if(newfile == 1) {
+                    echo();
                     attron(COLOR_PAIR(1));
                     mvprintw(ht-1, 0, "Enter file name : ");
                     mvscanw(ht-1, strlen("Enter file name : "), "%s", filename);
                     attroff(COLOR_PAIR(1));
+                    noecho();
                     refresh();
                     if((fd = open(filename, O_RDWR | O_CREAT | O_TRUNC, S_IRWXU)) == -1) {
                         printf("Error :(");
@@ -631,11 +636,13 @@ int main(int argc, char *argv[]) {
                 cpy = 0;
                 memset(copy, '\0', LINEMAX);
                 while(ch = getch()) {
+                    // to select 
                     if(ch == KEY_RIGHT && x < LINEMAX - 1 && x < bf->num_chars - 1){
                         copy[cpy++] = bf->line[x];
                         addch(bf->line[x] | A_STANDOUT);
                         move(y, x++);
                     }
+                    // to deselect
                     else if(ch == KEY_LEFT && x >= 0 && x > select) {
                         move(y, --x);
                         copy[--cpy] = '\0';
@@ -688,11 +695,13 @@ int main(int argc, char *argv[]) {
                 cpy = 0;
                 memset(copy, '\0', LINEMAX);
                 while(ch = getch()) {
+                    // to select
                     if(ch == KEY_RIGHT && x < LINEMAX - 1 && x < bf->num_chars - 1){
                         copy[cpy++] = bf->line[x];
                         addch(bf->line[x] | A_STANDOUT);
                         move(y, x++);
                     }
+                    // to deselect
                     else if(ch == KEY_LEFT && x >= 0 && x > select) {
                         move(y, --x);
                         copy[--cpy] = '\0';
